@@ -1,5 +1,7 @@
 # sourcing-agent
 
+[![tests](https://github.com/KapilXDev/sourcing-agent/actions/workflows/tests.yml/badge.svg)](https://github.com/KapilXDev/sourcing-agent/actions/workflows/tests.yml)
+
 An autonomous job-sourcing agent over **13 sources**. It crawls job boards, collapses
 duplicates, rejects most postings without spending a token, runs the survivors through a
 three-stage model funnel under a hard spend cap, and writes tailored applications — which
@@ -293,7 +295,8 @@ $ pytest
 185 passed in 1.19s
 ```
 
-The suite runs fully offline against the fixture corpus. It's weighted toward the claims
+CI runs the same command on Python 3.10, 3.11 and 3.12 — no network, no API key, no
+browser. The suite runs fully offline against the fixture corpus. It's weighted toward the claims
 that are easy to quietly break:
 
 - **the gate** — a case per rule in both directions, including that `remote` cannot launder

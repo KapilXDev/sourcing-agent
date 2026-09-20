@@ -1,0 +1,31 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install
+        run: pip install -e ".[dev]"
+
+      # No network, no ANTHROPIC_API_KEY, no browser. The suite runs against the
+      # recorded fixture corpus with a scripted model backend, so CI exercises
+      # all 13 connectors, the gate, the funnel and the budget ledger for free.
+      - name: Test
+        run: pytest -q
