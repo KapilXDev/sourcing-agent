@@ -251,8 +251,9 @@ def test_full_offline_run(settings, backend):
 
     assert report.discovered == 31
     assert report.deduped == 1, "the same role on Greenhouse and Remotive"
-    assert report.gate_passed == 18
-    assert report.gate_rejected == 12
+    assert report.gate_passed == 17
+    # 13, including the Berlin role that is tagged remote but is not US-eligible.
+    assert report.gate_rejected == 13
     assert [s.name for s in report.stages] == ["triage", "fit", "draft"]
     assert report.spend_usd > 0
     assert report.spend_usd <= report.budget_usd

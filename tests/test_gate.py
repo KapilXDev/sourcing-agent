@@ -13,7 +13,12 @@ from datetime import timedelta
 import pytest
 
 from sourcing_agent.config import GateConfig, Profile, WorkAuthorization
-from sourcing_agent.gate import DecisionGate, detect_seniority, parse_salary
+from sourcing_agent.gate import (
+    DecisionGate,
+    detect_seniority,
+    parse_salary,
+    remote_residue,
+)
 from tests.conftest import make_posting
 
 
@@ -239,3 +244,73 @@ def test_keyword_matching_respects_word_boundaries(profile):
         "role is mostly stakeholder management and writing documents for review."
     )
     assert "keywords:insufficient" in rules_fired(gate.evaluate(make_posting(description=text)))
+
+
+# -- remote is an arrangement, not a place ---------------------------------
+
+
+@pytest.mark.parametrize(
+    "location,remote",
+    [
+        ("Remote - US", True),
+        ("Remote - United States", True),
+        ("Remote (US)", True),
+        ("Remote, US", True),
+        ("USA Only", True),
+        ("Remote", True),            # no place named -> unrestricted
+        ("Worldwide", True),
+        ("Anywhere", True),
+        ("Remote, Austin", True),
+        ("Austin, TX", None),
+    ],
+)
+def test_eligible_locations_pass(gate, location, remote):
+    decision = gate.evaluate(make_posting(location=location, remote=remote))
+    assert "location:ineligible" not in rules_fired(decision), decision.rejections
+
+
+@pytest.mark.parametrize(
+    "location",
+    ["Berlin", "Remote - EU only", "Remote (Germany)", "Fully Remote - Tokyo", "Remote - LATAM"],
+)
+def test_remote_does_not_launder_an_ineligible_location(gate, location):
+    """The bug this rule exists for: treating `remote` as a free pass lets a
+    role the candidate cannot legally take reach the paid stages."""
+    decision = gate.evaluate(make_posting(location=location, remote=True))
+    assert "location:ineligible" in rules_fired(decision)
+
+
+def test_country_synonyms_match_in_both_directions():
+    profile = Profile(name="T", email="t@e.com", titles=[], must_have_any=[], locations=["us"])
+    gate = DecisionGate(profile, GateConfig())
+    for written in ("Remote - United States", "USA", "Remote (U.S.)", "America"):
+        decision = gate.evaluate(make_posting(location=written, remote=True))
+        assert "location:ineligible" not in rules_fired(decision), written
+
+
+def test_listing_only_remote_imposes_no_geography():
+    """`locations: [remote]` describes an arrangement, not a place, so it must
+    not silently become a geographic filter that nothing can satisfy."""
+    profile = Profile(name="T", email="t@e.com", titles=[], must_have_any=[], locations=["remote"])
+    gate = DecisionGate(profile, GateConfig())
+    for written in ("Berlin", "Tokyo", "Remote - EU"):
+        assert gate.evaluate(make_posting(location=written, remote=True)).passed, written
+
+
+def test_unspecified_location_is_still_rejected_when_not_remote(gate):
+    decision = gate.evaluate(make_posting(location=None, remote=False))
+    assert "location:ineligible" in rules_fired(decision)
+
+
+@pytest.mark.parametrize(
+    "raw,expected",
+    [
+        ("Remote - US", "US"),
+        ("Fully Remote (EU)", "EU"),
+        ("Remote", ""),
+        ("100% Remote — Berlin", "Berlin"),
+        ("Austin, TX", "Austin, TX"),
+    ],
+)
+def test_remote_residue(raw, expected):
+    assert remote_residue(raw) == expected

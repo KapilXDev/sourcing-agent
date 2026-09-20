@@ -52,6 +52,66 @@ _CLEARANCE = re.compile(r"\b(security\s+clearance|ts/sci|top\s+secret|polygraph)
 _ONSITE_ONLY = re.compile(r"\b(on-?site\s+only|in-?office\s+\d\s*days|no\s+remote|100%\s+on-?site)\b", re.I)
 _REMOTE_HINT = re.compile(r"\b(remote|distributed|work\s+from\s+home|anywhere)\b", re.I)
 
+# "Remote" is a working arrangement, not a place. Most remote postings still
+# carry a geographic restriction in the same field - "Remote - US", "Remote
+# (EU)", "Remote, Berlin" - so the marker has to be stripped off before what
+# remains can be tested against the profile's eligible locations.
+_REMOTE_MARKER = re.compile(
+    r"\b(?:fully\s+|100%\s+)?(?:remote|distributed|telecommute|work\s+from\s+home|wfh)\b",
+    re.I,
+)
+_UNRESTRICTED = re.compile(
+    r"\b(?:anywhere|world\s*wide|global(?:ly)?|international|any\s+location)\b", re.I
+)
+_SEPARATORS = " \t,;:/|·-–—()[]"
+
+# Profile entries that describe an arrangement rather than a place. Listing
+# one imposes no geographic constraint, so it is not compiled into the
+# eligible-location set - otherwise "Remote - Tokyo" would satisfy a profile
+# that only said "remote", which is the bug this rule exists to prevent.
+_ARRANGEMENT_WORDS = frozenset(
+    {"remote", "anywhere", "worldwide", "global", "distributed", "work from home", "wfh", "hybrid"}
+)
+
+# Equivalence classes, applied in both directions: a profile saying "united
+# states" matches a posting saying "US", and vice versa. Deliberately short -
+# an over-eager table produces false eligibility, which is the expensive
+# direction. Ambiguous abbreviations ("CA" is both California and Canada) are
+# left out on purpose.
+_LOCATION_SYNONYMS: tuple[frozenset[str], ...] = (
+    frozenset(
+        {"united states", "united states of america", "usa", "u.s.", "u.s.a.", "us", "america"}
+    ),
+    frozenset({"united kingdom", "uk", "u.k.", "great britain", "britain", "england"}),
+    frozenset({"european union", "eu", "europe", "emea"}),
+    frozenset({"canada", "canadian"}),
+    frozenset({"germany", "deutschland"}),
+    frozenset({"netherlands", "holland"}),
+    frozenset({"australia", "new zealand", "anz"}),
+    frozenset({"latin america", "latam", "south america"}),
+    frozenset({"asia pacific", "apac"}),
+)
+
+
+def expand_location(name: str) -> set[str]:
+    """A location plus every form the boards write it in."""
+    key = name.strip().lower()
+    forms = {key}
+    for group in _LOCATION_SYNONYMS:
+        if key in group:
+            forms |= set(group)
+    return forms
+
+
+def remote_residue(where: str) -> str:
+    """What a location field says *besides* being remote.
+
+    ``"Remote - US"`` -> ``"US"``; ``"Fully Remote (EU)"`` -> ``"EU"``;
+    ``"Remote"`` -> ``""``. An empty residue means genuinely unrestricted.
+    """
+    collapsed = re.sub(r"\s+", " ", _REMOTE_MARKER.sub(" ", where))
+    return collapsed.strip(_SEPARATORS).strip()
+
 # $120,000 - $150,000  |  $120k-$150k  |  $120000 to $150000
 # The k-suffixed form is tried first, or "$150k" would match as a bare "150"
 # and the range half would be lost. A currency symbol is required on the low
@@ -138,7 +198,16 @@ class DecisionGate:
         self._nice = [(k, _keyword_pattern(k)) for k in profile.nice_to_have]
         self._exclude_kw = [(k, _keyword_pattern(k)) for k in profile.exclude_keywords]
         self._exclude_co = [c.lower().strip() for c in profile.exclude_companies]
-        self._locations = [_keyword_pattern(loc) for loc in profile.locations]
+
+        # Places only. Arrangement words ("remote") are dropped, and each real
+        # place is expanded to the forms job boards actually write.
+        geo = [
+            form
+            for loc in profile.locations
+            if loc.strip().lower() not in _ARRANGEMENT_WORDS
+            for form in sorted(expand_location(loc))
+        ]
+        self._locations = [_keyword_pattern(name) for name in geo]
 
         self.rules: list[_Rule] = [
             _Rule("dedupe:already_assessed", self._r_seen),
@@ -300,14 +369,33 @@ class DecisionGate:
         return f"seniority:{direction}({level})"
 
     def _r_location(self, posting: Posting, haystack: str) -> str | None:
+        """Eligibility, not preference.
+
+        The subtlety is remote work. Treating ``remote`` as a free pass - the
+        obvious implementation - lets "Remote (EU only)" and "Remote, Tokyo"
+        through a profile that can only work in the US, and they then cost
+        money at every downstream stage. So the remote marker is stripped and
+        whatever remains is tested: nothing left means genuinely unrestricted,
+        anything left is a restriction that has to match.
+        """
         if not self._locations:
-            return None
+            return None  # the profile states no geographic constraint
+
         where = posting.location or ""
-        if posting.remote or _REMOTE_HINT.search(where):
+        if _UNRESTRICTED.search(where):
+            return None  # "Worldwide", "Anywhere" - open to everyone
+
+        residue = remote_residue(where)
+        is_remote = bool(posting.remote) or _REMOTE_MARKER.search(where) is not None
+
+        if is_remote and not residue:
+            return None  # plain "Remote", no place named
+
+        target = residue or where
+        if any(pattern.search(target) for pattern in self._locations):
             return None
-        if any(pattern.search(where) for pattern in self._locations):
-            return None
-        return f"location:ineligible({where or 'unspecified'})"
+
+        return f"location:ineligible({target or 'unspecified'})"
 
     def _r_remote(self, posting: Posting, haystack: str) -> str | None:
         if not self.profile.remote_only:

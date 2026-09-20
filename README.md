@@ -87,23 +87,23 @@ fails if anything in it touches the network). Every rejection carries a stable r
 ```console
 $ sourcing-agent gate          # costs exactly $0.00
 
-passed the gate: 18
+passed the gate: 17
  score  source           title                                matched
     95  greenhouse       Senior Backend Engineer, Ingestion   python, go, kubernetes, postgres, aws
     95  lever            Senior Software Engineer, Platform   python, go, kubernetes, postgres, aws
     91  workday          Senior Software Engineer, Platform   python, go, kubernetes, postgres, aws
     …
 
-rejected: 12 (zero tokens spent)
+rejected: 13 (zero tokens spent)
  rule                               count
  keywords:insufficient                  6
  content:too_thin                       5
  title:no_match                         4
  title:excluded                         2
+ location:ineligible                    2
  seniority:underqualified               2
  seniority:overqualified                1
  comp:below_floor                       1
- location:ineligible                    1
  authorization:clearance_required       1
  staleness:too_old                      1
 ```
@@ -116,7 +116,15 @@ The gate also produces a deterministic 0–100 score used **only to order** the 
 to reject. Ordering matters because under a tight budget the tail of the queue may never be
 reached.
 
-One refinement: some sources (SmartRecruiters, Workday) return lists without bodies.
+One subtlety worth calling out, because the obvious implementation is wrong: **remote is an
+arrangement, not a place.** Treating `remote: true` as a free pass on the location rule lets
+"Remote (EU only)" and "Remote — Tokyo" through a profile that can only work in the US, and
+they then cost money at every stage downstream. So the remote marker is stripped and
+whatever remains is tested — nothing left (`"Remote"`, `"Worldwide"`) means genuinely
+unrestricted; anything left (`"Remote - EU only"` → `"EU only"`) is a restriction that has
+to match.
+
+Another refinement: some sources (SmartRecruiters, Workday) return lists without bodies.
 Fetching every body up front would multiply the crawl, so detail is fetched only for
 postings rejected *solely* on body-dependent rules — extra requests stay proportional to
 genuine near-misses.
@@ -130,13 +138,13 @@ genuine near-misses.
 | draft | `claude-opus-5` | one call per finalist | description + prior assessment |
 
 Each stage is more expensive per item and sees fewer items than the last. On the demo
-corpus the funnel costs **$0.17**; sending every gate survivor to Opus for both reading and
-drafting costs **$0.48** — about **2.8×** — because the expensive model would spend most of
+corpus the funnel costs **$0.16**; sending every gate survivor to Opus for both reading and
+drafting costs **$0.45** — about **2.8×** — because the expensive model would spend most of
 its time rejecting things a cheap one rejects just as well. The larger saving happens
-upstream: the gate removed 12 of 30 postings for $0.00 before the funnel started.
+upstream: the gate removed 13 of 30 postings for $0.00 before the funnel started.
 
 Per-token, Opus is 5× Haiku. The funnel's leverage is *volume*, not rate — Opus sees 5
-items, not 18.
+items, not 17.
 
 Two details that matter more than the model names:
 
@@ -168,12 +176,12 @@ still usable:
 stage      model              in   out     cost   skipped
 discover   -                   -    31   $0.0000         -
 dedupe     -                  31    30   $0.0000         -
-gate       none               30    18   $0.0000         -
-triage     claude-haiku-4-5   18    18   $0.0079         -
-fit        claude-sonnet-5    18    18   $0.0945         -
+gate       none               30    17   $0.0000         -
+triage     claude-haiku-4-5   17    17   $0.0077         -
+fit        claude-sonnet-5    17    17   $0.0893         -
 draft      claude-opus-5       5     5   $0.0677         -
 
-spend: $0.1701 of $2.50 cap
+spend: $0.1647 of $2.50 cap
 ```
 
 Estimate and actual are both persisted per call, so the headroom multiplier can be tuned
@@ -282,14 +290,14 @@ run.
 
 ```console
 $ pytest
-162 passed in 1.12s
+185 passed in 1.19s
 ```
 
 The suite runs fully offline against the fixture corpus. It's weighted toward the claims
 that are easy to quietly break:
 
-- **the gate** — a case per rule in both directions, plus a test that fails if the gate
-  performs any I/O
+- **the gate** — a case per rule in both directions, including that `remote` cannot launder
+  an ineligible location, plus a test that fails if the gate performs any I/O
 - **the cap** — that a refused call is never dispatched, that a failed call releases its
   reservation, and a 500-iteration hammer asserting the cap holds
 - **rights** — that all 8 read-only connectors have no `submit` attribute, and that each of
@@ -300,11 +308,11 @@ that are easy to quietly break:
 
 ## Limits, stated plainly
 
-- **A `remote: true` posting skips the location rule entirely.** A role tagged remote but
-  restricted to Berlin or Tokyo will pass a `locations: [united states]` profile and reach
-  the paid stages. This is a deliberate default — "remote" usually does mean *anywhere* —
-  but it is the gate erring permissive in the one direction that costs money. If your
-  profile has a hard country constraint, tighten `_r_location` in `gate.py`.
+- **The country synonym table is short by design.** Nine equivalence groups (US, UK, EU,
+  Canada, …) let a profile saying `united states` match a posting saying `US`. An unlisted
+  form is matched literally, so `CONUS` or `Stateside` would read as ineligible. Erring
+  toward a false rejection is the cheap direction; the table is in `gate.py` and is a
+  one-line addition.
 - **Fixtures are synthetic.** Their *shapes* are real (Greenhouse's double-escaped HTML,
   Workday's `"Posted 4 Days Ago"`, HN's pipe convention), but a public repo can't ship other
   people's postings. Record real ones with `SOURCING_RECORD=1`.
