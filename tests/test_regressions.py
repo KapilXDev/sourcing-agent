@@ -5,7 +5,6 @@ Each of these passed silently before the fix, which is why they are here.
 
 from __future__ import annotations
 
-import os
 import pathlib
 
 import pytest
