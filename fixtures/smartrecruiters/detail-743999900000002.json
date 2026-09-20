@@ -1,0 +1,17 @@
+{
+  "id": "743999900000002",
+  "name": "Software Engineer, Data Platform",
+  "jobAd": {
+    "sections": {
+      "companyDescription": {
+        "text": "<p>Demo Group builds logistics software.</p>"
+      },
+      "jobDescription": {
+        "text": "<p>We are looking for an engineer to own our ingestion platform end to end. You will design and operate distributed services in Python and Go, run them on Kubernetes, and keep a heavily loaded Postgres fleet healthy under a sustained write path. The team owns its services in production, including on-call, capacity planning and incident review. We care about correctness under partial failure more than raw throughput.\n\nWhat we look for: strong fundamentals in distributed systems, comfort with AWS primitives, and a track record of shipping services that other teams depend on. Experience with Kafka or gRPC is a plus but not required.\n\nCompensation: $180,000 - $225,000 plus equity.</p>"
+      },
+      "qualifications": {
+        "text": "<ul><li>7+ years of backend experience</li></ul>"
+      }
+    }
+  }
+}

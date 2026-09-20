@@ -1,0 +1,36 @@
+{
+  "content": [
+    {
+      "id": "743999900000001",
+      "uuid": "743999900000001",
+      "name": "Senior Backend Engineer",
+      "company": {
+        "name": "Demo Group"
+      },
+      "releasedDate": "2026-09-18T10:08:09.365492+00:00",
+      "location": {
+        "city": "Austin",
+        "region": "TX",
+        "country": "us",
+        "remote": true
+      },
+      "applyUrl": "https://jobs.smartrecruiters.com/DemoGroup/743999900000001"
+    },
+    {
+      "id": "743999900000002",
+      "uuid": "743999900000002",
+      "name": "Software Engineer, Data Platform",
+      "company": {
+        "name": "Demo Group"
+      },
+      "releasedDate": "2026-09-15T10:08:09.365492+00:00",
+      "location": {
+        "city": "New York",
+        "region": "NY",
+        "country": "us",
+        "remote": false
+      },
+      "applyUrl": "https://jobs.smartrecruiters.com/DemoGroup/743999900000002"
+    }
+  ]
+}

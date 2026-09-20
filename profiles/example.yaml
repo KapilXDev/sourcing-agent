@@ -1,0 +1,129 @@
+# Example profile. Copy it, edit it, and iterate with `sourcing-agent gate`
+# until the rejection table looks right - that loop costs nothing.
+
+profile:
+  name: Ada Lovelace
+  email: ada@example.com
+  phone: "+1-555-0100"
+  location: Austin, TX
+  links:
+    github: https://github.com/example
+    linkedin: https://www.linkedin.com/in/example
+
+  titles:
+    - backend engineer
+    - software engineer
+    - platform engineer
+    - infrastructure engineer
+  exclude_titles:
+    - sales
+    - solutions architect
+    - support engineer
+  seniority: [mid, senior, staff]
+
+  must_have_any: [python, go, kubernetes, postgres, aws, distributed systems]
+  nice_to_have: [rust, terraform, kafka, grpc]
+  exclude_keywords: [unpaid, commission only, equity only]
+  exclude_companies: []
+
+  locations: [united states, remote, austin, san francisco, new york]
+  remote_only: false
+  work_authorization:
+    country: US
+    needs_sponsorship: false
+    has_clearance: false
+  min_base_salary: 150000
+
+  summary: >-
+    Backend engineer with seven years building distributed services in Python
+    and Go. Owned the payments ingestion pipeline at a Series C fintech, moved
+    it from a single Postgres instance to a sharded, event-driven design
+    handling 40k events per second.
+  # resume_path: ./resume.pdf   # used verbatim for submissions
+
+gate:
+  max_age_days: 30
+  min_description_chars: 240
+  min_keyword_hits: 2
+  max_to_funnel: 250
+  skip_seen_days: 14
+
+budget:
+  cap_usd: 2.50
+  reserve_headroom: 1.0
+
+funnel:
+  triage:
+    model: claude-haiku-4-5
+    max_tokens: 4000
+    batch_size: 12
+  fit:
+    model: claude-sonnet-5
+    max_tokens: 4000
+    keep_top: 40
+    thinking: true
+  draft:
+    model: claude-opus-5
+    max_tokens: 8000
+    keep_top: 5
+    effort: high
+    thinking: true
+    min_score: 70
+
+submission:
+  # Off by default. Turning it on is not enough on its own: a connector must
+  # also hold submission rights, appear in allow_connectors, and have its
+  # credential set.
+  enabled: false
+  dry_run: true
+  max_per_run: 3
+  allow_connectors: []
+
+sources:
+  greenhouse:
+    enabled: true
+    companies: [demo-labs]
+  lever:
+    enabled: true
+    companies: [demoworks]
+  ashby:
+    enabled: true
+    companies: [demoscale]
+  workable:
+    enabled: true
+    companies: [demoflow]
+  smartrecruiters:
+    enabled: true
+    companies: [DemoGroup]
+  recruitee:
+    enabled: true
+    companies: [demostudio]
+  remoteok:
+    enabled: true
+    limit: 50
+  remotive:
+    enabled: true
+    limit: 50
+  arbeitnow:
+    enabled: true
+    limit: 50
+  hackernews:
+    enabled: true
+    limit: 50
+  workday:
+    enabled: true
+    companies: [demotech/DemoCareers]
+    limit: 20
+  linkedin:
+    enabled: true
+    query: backend engineer
+    limit: 25
+  wellfound:
+    enabled: true
+    query: software-engineer
+    limit: 25
+
+db_path: sourcing.db
+out_dir: out
+fixtures_dir: fixtures
+offline: true

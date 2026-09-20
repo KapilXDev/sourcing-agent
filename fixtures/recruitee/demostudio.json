@@ -1,0 +1,16 @@
+{
+  "offers": [
+    {
+      "id": 900001,
+      "slug": "senior-backend-engineer",
+      "title": "Senior Backend Engineer",
+      "company_name": "Demo Studio",
+      "location": "Remote",
+      "remote": true,
+      "published_at": "2026-09-16T10:08:09.365492+00:00",
+      "careers_url": "https://demostudio.recruitee.com/o/senior-backend-engineer",
+      "description": "<p>We are looking for an engineer to own our ingestion platform end to end. You will design and operate distributed services in Python and Go, run them on Kubernetes, and keep a heavily loaded Postgres fleet healthy under a sustained write path. The team owns its services in production, including on-call, capacity planning and incident review. We care about correctness under partial failure more than raw throughput.\n\nWhat we look for: strong fundamentals in distributed systems, comfort with AWS primitives, and a track record of shipping services that other teams depend on. Experience with Kafka or gRPC is a plus but not required.</p>",
+      "requirements": "<ul><li>Python, Go, Kubernetes</li></ul>"
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+[
+  {
+    "id": "11110000-aaaa-4000-8000-000000000001",
+    "text": "Senior Software Engineer, Platform",
+    "hostedUrl": "https://jobs.lever.co/demoworks/11110000-aaaa-4000-8000-000000000001",
+    "createdAt": 1789812489365,
+    "categories": {
+      "location": "Remote (US)",
+      "team": "Engineering",
+      "commitment": "Full-time"
+    },
+    "descriptionPlain": "We are looking for an engineer to own our ingestion platform end to end. You will design and operate distributed services in Python and Go, run them on Kubernetes, and keep a heavily loaded Postgres fleet healthy under a sustained write path. The team owns its services in production, including on-call, capacity planning and incident review. We care about correctness under partial failure more than raw throughput.",
+    "lists": [
+      {
+        "text": "What you will do",
+        "content": "<ul><li>What we look for: strong fundamentals in distributed systems, comfort with AWS primitives, and a track record of shipping services that other teams depend on. Experience with Kafka or gRPC is a plus but not required.\n\nCompensation: $180,000 - $225,000 plus equity.</li></ul>"
+      }
+    ],
+    "additionalPlain": ""
+  },
+  {
+    "id": "11110000-aaaa-4000-8000-000000000002",
+    "text": "Infrastructure Engineer",
+    "hostedUrl": "https://jobs.lever.co/demoworks/11110000-aaaa-4000-8000-000000000002",
+    "createdAt": 1789294089365,
+    "categories": {
+      "location": "San Francisco, CA",
+      "team": "Engineering",
+      "commitment": "Full-time"
+    },
+    "descriptionPlain": "We are looking for an engineer to own our ingestion platform end to end. You will design and operate distributed services in Python and Go, run them on Kubernetes, and keep a heavily loaded Postgres fleet healthy under a sustained write path. The team owns its services in production, including on-call, capacity planning and incident review. We care about correctness under partial failure more than raw throughput.",
+    "lists": [
+      {
+        "text": "What you will do",
+        "content": "<ul><li>What we look for: strong fundamentals in distributed systems, comfort with AWS primitives, and a track record of shipping services that other teams depend on. Experience with Kafka or gRPC is a plus but not required.</li></ul>"
+      }
+    ],
+    "additionalPlain": ""
+  },
+  {
+    "id": "11110000-aaaa-4000-8000-000000000003",
+    "text": "Engineering Manager, Platform",
+    "hostedUrl": "https://jobs.lever.co/demoworks/11110000-aaaa-4000-8000-000000000003",
+    "createdAt": 1789639689365,
+    "categories": {
+      "location": "Remote (US)",
+      "team": "Engineering",
+      "commitment": "Full-time"
+    },
+    "descriptionPlain": "We are looking for an engineer to own our ingestion platform end to end. You will design and operate distributed services in Python and Go, run them on Kubernetes, and keep a heavily loaded Postgres fleet healthy under a sustained write path. The team owns its services in production, including on-call, capacity planning and incident review. We care about correctness under partial failure more than raw throughput.",
+    "lists": [
+      {
+        "text": "What you will do",
+        "content": "<ul><li>What we look for: strong fundamentals in distributed systems, comfort with AWS primitives, and a track record of shipping services that other teams depend on. Experience with Kafka or gRPC is a plus but not required.</li></ul>"
+      }
+    ],
+    "additionalPlain": ""
+  },
+  {
+    "id": "11110000-aaaa-4000-8000-000000000004",
+    "text": "Backend Engineer (Contract)",
+    "hostedUrl": "https://jobs.lever.co/demoworks/11110000-aaaa-4000-8000-000000000004",
+    "createdAt": 1789726089365,
+    "categories": {
+      "location": "Remote (US)",
+      "team": "Engineering",
+      "commitment": "Full-time"
+    },
+    "descriptionPlain": "We are looking for an engineer to own our ingestion platform end to end. You will design and operate distributed service",
+    "lists": [
+      {
+        "text": "What you will do",
+        "content": "<ul><li></li></ul>"
+      }
+    ],
+    "additionalPlain": ""
+  }
+]

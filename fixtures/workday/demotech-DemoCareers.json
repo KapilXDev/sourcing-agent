@@ -1,0 +1,23 @@
+{
+  "total": 2,
+  "jobPostings": [
+    {
+      "title": "Senior Software Engineer, Platform",
+      "externalPath": "/job/Austin-TX/Senior-Software-Engineer_R-100001",
+      "locationsText": "Austin, TX",
+      "postedOn": "Posted 4 Days Ago",
+      "bulletFields": [
+        "R-100001"
+      ]
+    },
+    {
+      "title": "Principal Backend Engineer",
+      "externalPath": "/job/Remote/Principal-Backend-Engineer_R-100002",
+      "locationsText": "Remote, US",
+      "postedOn": "Posted 12 Days Ago",
+      "bulletFields": [
+        "R-100002"
+      ]
+    }
+  ]
+}

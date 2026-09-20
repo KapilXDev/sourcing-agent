@@ -1,0 +1,17 @@
+{
+  "id": 41000000,
+  "children": [
+    {
+      "id": 41000101,
+      "author": "demo_founder",
+      "created_at": "2026-09-13T10:08:09.365492+00:00",
+      "text": "<p>Thread Systems | Senior Backend Engineer | Remote (US) | $170k-$210k | REMOTE</p><p>We are looking for an engineer to own our ingestion platform end to end. You will design and operate distributed services in Python and Go, run them on Kubernetes, and keep a heavily loaded Postgres fleet healthy under a sustained write path. The team owns its services in production, including on-call, capacity planning and incident review. We care about correctness under partial failure more than raw throughput.\n\nWhat we look for: strong fundamentals in distributed systems, comfort with AWS primitives, and a track record of shipping services that other teams depend on. Experience with Kafka or gRPC is a plus but not required.</p>"
+    },
+    {
+      "id": 41000102,
+      "author": "someone",
+      "created_at": "2026-09-13T10:08:09.365492+00:00",
+      "text": "<p>Does anyone know if this thread is still monitored after the first week? I posted last month and got nothing. Asking because I want to know whether it is worth writing a careful post or not.</p>"
+    }
+  ]
+}
