@@ -129,10 +129,14 @@ genuine near-misses.
 | fit | `claude-sonnet-5` | one call per posting | full description |
 | draft | `claude-opus-5` | one call per finalist | description + prior assessment |
 
-Each stage is more expensive per item and sees fewer items than the last. A flat design
-sending every gate survivor to Opus would cost roughly 25× more for the same shortlist,
-because the expensive model would spend most of its time rejecting things a cheap one
-rejects just as well.
+Each stage is more expensive per item and sees fewer items than the last. On the demo
+corpus the funnel costs **$0.17**; sending every gate survivor to Opus for both reading and
+drafting costs **$0.48** — about **2.8×** — because the expensive model would spend most of
+its time rejecting things a cheap one rejects just as well. The larger saving happens
+upstream: the gate removed 12 of 30 postings for $0.00 before the funnel started.
+
+Per-token, Opus is 5× Haiku. The funnel's leverage is *volume*, not rate — Opus sees 5
+items, not 18.
 
 Two details that matter more than the model names:
 
